@@ -1,168 +1,171 @@
 'use client';
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
-export default function Register() {
+export default function RegisterPage() {
   const router = useRouter();
   
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    name: '',
-    role: 'shipper',
+    fullName: '',
+    role: 'shipper'
   });
-
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setSuccess('');
 
     try {
-      // Basic validation
-      if (!formData.email || !formData.password || !formData.name) {
-        setError('Please fill all fields');
-        setLoading(false);
-        return;
-      }
+      console.log('🔵 Starting registration...', formData);
 
-      if (formData.password.length < 6) {
-        setError('Password must be at least 6 characters');
-        setLoading(false);
-        return;
-      }
-
-      // Success message
-      setSuccess('Registration successful! Redirecting to login...');
-      
-      // Save to localStorage (temporary - later will use Supabase)
-      const userData = {
+      // STEP 1: Create user in Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
-        name: formData.name,
-        role: formData.role,
-        createdAt: new Date().toISOString(),
-      };
-      
-      localStorage.setItem(`user_${formData.email}`, JSON.stringify(userData));
+      });
 
-      // Redirect to login after 2 seconds
-      setTimeout(() => {
-        router.push('/login');
-      }, 2000);
+      if (authError) {
+        console.log('❌ Auth Error:', authError);
+        throw authError;
+      }
 
-    } catch (err) {
-      setError('Something went wrong');
+      console.log('✅ Auth User Created:', authData.user?.id);
+
+      // STEP 2: Save user details in users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .insert([
+          {
+            id: authData.user?.id,
+            email: formData.email,
+            full_name: formData.fullName,
+            role: formData.role,
+            created_at: new Date().toISOString()
+          }
+        ])
+        .select();
+
+      if (userError) {
+        console.log('❌ User Insert Error:', userError);
+        throw userError;
+      }
+
+      console.log('✅ User Data Saved:', userData);
+
+      alert('✅ Account created successfully! Please login.');
+      router.push('/login');
+
+    } catch (err: any) {
+      console.error('❌ Registration Failed:', err);
+      setError(err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+    <div className="min-h-screen bg-[#2563EB] flex items-center justify-center p-4">
+      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
         
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-blue-600 mb-2">NAVROX</h1>
-          <p className="text-gray-600">Create Your Account</p>
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold text-[#2563EB] mb-1">
+            NAVROX
+          </h1>
+          <p className="text-gray-600 text-sm">
+            Create Your Account
+          </p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-100 border-2 border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
-            ⚠️ {error}
-          </div>
-        )}
-
-        {/* Success Message */}
-        {success && (
-          <div className="bg-green-100 border-2 border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4">
-            ✅ {success}
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
+            {error}
           </div>
         )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           
-          {/* Name */}
+          {/* Full Name */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Full Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Full Name
+            </label>
             <input
               type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
+              required
+              value={formData.fullName}
+              onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent"
               placeholder="John Doe"
-              className="w-full p-4 border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-600 text-lg"
             />
           </div>
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Email Address
+            </label>
             <input
               type="email"
-              name="email"
+              required
               value={formData.email}
-              onChange={handleChange}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent"
               placeholder="your@email.com"
-              className="w-full p-4 border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-600 text-lg"
             />
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Password
+            </label>
             <input
               type="password"
-              name="password"
+              required
+              minLength={6}
               value={formData.password}
-              onChange={handleChange}
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent"
               placeholder="At least 6 characters"
-              className="w-full p-4 border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-600 text-lg"
             />
           </div>
 
           {/* Role Selection */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">I am a:</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              I am a:
+            </label>
             <div className="space-y-2">
-              <label className="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50">
+              <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition">
                 <input
                   type="radio"
                   name="role"
                   value="shipper"
                   checked={formData.role === 'shipper'}
-                  onChange={handleChange}
-                  className="w-4 h-4 text-blue-600"
+                  onChange={(e) => setFormData({...formData, role: e.target.value})}
+                  className="mr-3 text-[#2563EB] focus:ring-[#2563EB]"
                 />
-                <span className="ml-3 text-lg">📦 Shipper (Load Provider)</span>
+                <span className="text-sm">📦 Shipper (Load Provider)</span>
               </label>
-
-              <label className="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50">
+              <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition">
                 <input
                   type="radio"
                   name="role"
                   value="trucker"
                   checked={formData.role === 'trucker'}
-                  onChange={handleChange}
-                  className="w-4 h-4 text-blue-600"
+                  onChange={(e) => setFormData({...formData, role: e.target.value})}
+                  className="mr-3 text-[#2563EB] focus:ring-[#2563EB]"
                 />
-                <span className="ml-3 text-lg">🚛 Trucker (Load Carrier)</span>
+                <span className="text-sm">🚛 Trucker (Load Carrier)</span>
               </label>
             </div>
           </div>
@@ -171,22 +174,19 @@ export default function Register() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-lg font-bold text-lg hover:shadow-lg transition disabled:opacity-50"
+            className="w-full bg-[#2563EB] text-white py-3 rounded-lg font-medium hover:bg-[#1d4ed8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
 
-        {/* Login Link */}
-        <div className="text-center mt-6">
-          <p className="text-gray-600">
-            Already have an account?{' '}
-            <a href="/login" className="text-blue-600 font-bold hover:underline">
-              Login here
-            </a>
-          </p>
-        </div>
-
+        {/* Footer */}
+        <p className="text-center text-sm text-gray-600 mt-4">
+          Already have an account?{' '}
+          <a href="/login" className="text-[#2563EB] font-medium hover:underline">
+            Login here
+          </a>
+        </p>
       </div>
     </div>
   );
