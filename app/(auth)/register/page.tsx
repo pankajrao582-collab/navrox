@@ -9,7 +9,7 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    fullName: '',
+    Name: '',
     role: 'shipper'
   });
   
@@ -37,14 +37,14 @@ export default function RegisterPage() {
 
       console.log('✅ Auth User Created:', authData.user?.id);
 
-      // STEP 2: Save user details - USING "name" INSTEAD OF "full_name"
+      // STEP 2: Save user details - USING "name" INSTEAD OF "name"
       const { data: userData, error: userError } = await supabase
         .from('users')
         .insert([
           {
             id: authData.user?.id,
             email: formData.email,
-            name: formData.fullName,  // 👈 YE DEKHO - "name" use kiya!
+            name: formData.Name,  // 👈 YE DEKHO - "name" use kiya!
             role: formData.role,
             created_at: new Date().toISOString()
           }
@@ -97,8 +97,8 @@ export default function RegisterPage() {
             <input
               type="text"
               required
-              value={formData.fullName}
-              onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+              value={formData.Name}
+              onChange={(e) => setFormData({...formData, Name: e.target.value})}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
               placeholder="Pankaj Rao"
             />
