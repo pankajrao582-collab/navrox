@@ -249,7 +249,6 @@ export default function FreightCalculator() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
-          {/* INPUT SECTION */}
           <div className="bg-white rounded-2xl shadow-2xl p-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-8">📋 Trip Details</h2>
 
@@ -258,7 +257,7 @@ export default function FreightCalculator() {
               <select 
                 value={inputs.from}
                 onChange={(e) => handleInputChange('from', e.target.value)}
-                className="w-full p-4 border-2 border-blue-300 rounded-xl focus:outline-none focus:border-blue-600 text-lg font-semibold"
+                className="w-full p-4 border-2 border-blue-300 rounded-xl focus:outline-none focus:border-blue-600 text-lg font-semibold text-gray-700"
               >
                 {cities.map(city => <option key={city} value={city}>{city}</option>)}
               </select>
@@ -269,7 +268,7 @@ export default function FreightCalculator() {
               <select 
                 value={inputs.to}
                 onChange={(e) => handleInputChange('to', e.target.value)}
-                className="w-full p-4 border-2 border-blue-300 rounded-xl focus:outline-none focus:border-blue-600 text-lg font-semibold"
+                className="w-full p-4 border-2 border-blue-300 rounded-xl focus:outline-none focus:border-blue-600 text-lg font-semibold text-gray-700"
               >
                 {cities.map(city => <option key={city} value={city}>{city}</option>)}
               </select>
@@ -280,7 +279,7 @@ export default function FreightCalculator() {
               <select 
                 value={inputs.truckType}
                 onChange={(e) => handleInputChange('truckType', e.target.value)}
-                className="w-full p-4 border-2 border-purple-300 rounded-xl focus:outline-none focus:border-purple-600 text-lg font-semibold"
+                className="w-full p-4 border-2 border-green-300 rounded-xl focus:outline-none focus:border-purple-600 text-lg font-semibold text-gray-700"
               >
                 <option value="open">🚛 Open Truck (20 ton)</option>
                 <option value="container">📦 Container (25 ton)</option>
@@ -295,7 +294,7 @@ export default function FreightCalculator() {
               <select 
                 value={inputs.materialType}
                 onChange={(e) => handleInputChange('materialType', e.target.value)}
-                className="w-full p-4 border-2 border-green-300 rounded-xl focus:outline-none focus:border-green-600 text-lg font-semibold"
+                className="w-full p-4 border-2 border-green-300 rounded-xl focus:outline-none focus:border-green-600 text-lg font-semibold text-gray-700"
               >
                 <option value="general">📦 General (1.0x)</option>
                 <option value="fragile">🥚 Fragile (1.5x)</option>
@@ -307,19 +306,16 @@ export default function FreightCalculator() {
 
             <div className="mb-8">
               <label className="block text-sm font-bold text-gray-700 mb-3">⛽ Fuel Price (₹/liter)</label>
-              <div className="flex items-center">
-                <span className="text-2xl font-bold text-green-600">₹</span>
-                <input 
-                  type="number" 
-                  value={inputs.fuelPrice}
-                  onChange={(e) => handleInputChange('fuelPrice', e.target.value)}
-                  className="flex-1 ml-2 p-4 border-2 border-orange-300 rounded-xl focus:outline-none focus:border-orange-600 text-2xl font-bold"
-                />
-              </div>
+              <input 
+                type="number" 
+                value={inputs.fuelPrice}
+                onChange={(e) => handleInputChange('fuelPrice', e.target.value)}
+                className="w-full p-4 border-2 border-orange-300 rounded-xl focus:outline-none focus:border-orange-600 text-lg font-semibold text-gray-700"
+                placeholder="100"
+              />
             </div>
           </div>
 
-          {/* RESULTS SECTION */}
           {results && (
             <div className="space-y-6">
               
@@ -344,7 +340,7 @@ export default function FreightCalculator() {
                   
                   <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
                     <span className="text-gray-700 font-semibold">Days</span>
-                    <span className="text-xl font-bold text-blue-600">{results.days} day{results.days > 1 ? 's' : ''}</span>
+                    <span className="text-xl font-bold text-blue-600">{results.days}</span>
                   </div>
                   
                   <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
@@ -360,35 +356,35 @@ export default function FreightCalculator() {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
                     <span className="text-gray-700">Fuel</span>
-                    <span className="font-bold text-gray-800">₹{results.expenses.fuel}</span>
+                    <span className="font-bold text-black">₹{results.expenses.fuel}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
                     <span className="text-gray-700">Driver Wages</span>
-                    <span className="font-bold text-gray-800">₹{results.expenses.driver}</span>
+                    <span className="font-bold text-black">₹{results.expenses.driver}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
                     <span className="text-gray-700">Toll</span>
-                    <span className="font-bold text-gray-800">₹{results.expenses.toll}</span>
+                    <span className="font-bold text-black">₹{results.expenses.toll}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
                     <span className="text-gray-700">Parking</span>
-                    <span className="font-bold text-gray-800">₹{results.expenses.parking}</span>
+                    <span className="font-bold text-black">₹{results.expenses.parking}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
                     <span className="text-gray-700">Maintenance</span>
-                    <span className="font-bold text-gray-800">₹{results.expenses.maintenance}</span>
+                    <span className="font-bold text-black">₹{results.expenses.maintenance}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
                     <span className="text-gray-700">Insurance</span>
-                    <span className="font-bold text-gray-800">₹{results.expenses.insurance}</span>
+                    <span className="font-bold text-black">₹{results.expenses.insurance}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
                     <span className="text-gray-700">Overhead</span>
-                    <span className="font-bold text-gray-800">₹{results.expenses.overhead}</span>
+                    <span className="font-bold text-black">₹{results.expenses.overhead}</span>
                   </div>
                   
                   <div className="flex justify-between items-center p-4 bg-red-100 rounded-lg border-2 border-red-400 mt-4">
-                    <span className="text-gray-800 font-bold text-lg">TOTAL EXPENSES</span>
+                    <span className="font-bold text-lg text-black">TOTAL EXPENSES</span>
                     <span className="text-2xl font-bold text-red-600">₹{results.expenses.total}</span>
                   </div>
                 </div>
@@ -399,18 +395,18 @@ export default function FreightCalculator() {
                 
                 <div className="space-y-4">
                   <div className="flex justify-between items-center p-4 bg-white bg-opacity-20 rounded-lg">
-                    <span className="text-white text-lg">Shipper Pays</span>
-                    <span className="text-3xl font-bold">₹{results.suggestedPrice}</span>
+                    <span className="text-lg text-black">Shipper Pays</span>
+                    <span className="text-3xl font-bold text-black">₹{results.suggestedPrice}</span>
                   </div>
                   
                   <div className="flex justify-between items-center p-4 bg-white bg-opacity-20 rounded-lg">
-                    <span className="text-white text-lg">Commission (5%)</span>
-                    <span className="text-2xl font-bold">-₹{results.pricing.commission}</span>
+                    <span className="text-lg text-black">Commission (5%)</span>
+                    <span className="text-2xl font-bold text-black">-₹{results.pricing.commission}</span>
                   </div>
                   
                   <div className="flex justify-between items-center p-4 bg-white bg-opacity-20 rounded-lg">
-                    <span className="text-white text-lg">Expenses</span>
-                    <span className="text-2xl font-bold">-₹{results.expenses.total}</span>
+                    <span className="text-lg text-black">Expenses</span>
+                    <span className="text-2xl font-bold text-black">-₹{results.expenses.total}</span>
                   </div>
                   
                   <div className="flex justify-between items-center p-6 bg-white rounded-xl border-4 border-white mt-4">
